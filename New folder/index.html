@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>Access Point Connection</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .input-group {
+            padding: 5px;
+        }
+        
+        .button-group {
+            padding: 5px;
+        }
+        
+        input {
+            font-family: inherit;
+            width: 250px;
+            padding: 5px;
+            border: solid 1px gray;
+            border-radius: 10px;
+        }
+        
+        button {
+            font-family: inherit;
+            padding: 5px;
+            border: solid 1px gray;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body align='center'>
+    <div class='input-group'>
+        <label>SSID: </label><input id='ssid'>
+    </div>
+    <div class='input-group'>
+        <label>Pass: </label><input id='pass'>
+    </div>
+    <div class='button-group'>
+        <button id='ReloadButton'>Reload</button>
+        <button id='ClearButton'>Clear</button>
+        <button id='SubmitButton'>Submit</button>
+    </div>
+</body>
+
+<script>
+    document.getElementById('ReloadButton').onclick = function() {
+        console.log('Reload button is click...');
+        /* get api request */
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+            if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                if (xmlHttp.status == 200) { /* success request [code: 200] */
+                    var res = JSON.parse(xmlHttp.responseText);
+                    document.getElementById('ssid').value = res.ssid;
+                    document.getElementById('pass').value = res.pass;
+                    alert('Loading Success')
+                } else if (xmlHttp.status == 500) { /* fail request [another code] */
+                    alert('Loading fail');
+                }
+            }
+        };
+
+        xmlHttp.open('GET', '/ap'); /* create GET api */
+        xmlHttp.send(); /* send api to board */
+    };
+
+    document.getElementById('ClearButton').onclick = function() {
+        document.getElementById('ssid').value = '';
+        document.getElementById('pass').value = '';
+    };
+
+    document.getElementById('SubmitButton').onclick = function() {
+        console.log('Submit Button is click...');
+        /* post api request */
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+            if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                if (xmlHttp.status == 200) { /* success request [code: 200] */
+                    alert('Sending Success');
+                } else if (xmlHttp.status == 500) { /* fail request [another code] */
+                    alert('Sending fail');
+                }
+            }
+        };
+        var data = JSON.stringify({
+            ssid: document.getElementById('ssid').value,
+            pass: document.getElementById('pass').value
+        });
+        xmlHttp.open('POST', '/ap'); /* create POST api */
+        xmlHttp.send(data); /* send api to board */
+    };
+
+    document.getElementById('ReloadButton').click();
+</script>
+
+</html>
